@@ -16,16 +16,58 @@ public class MyMutation implements EvolutionaryOperator<MySolution> {
     }
 
     public List<MySolution> apply(List<MySolution> population, Random random) {
-        ArrayList<MySolution> result = new ArrayList<>(population.size());
         for (MySolution solution : population) {
-            int[][] solutionData = solution.getSolutionCoordinates();
-            MySolution newSol = new MySolution(solutionData.length);
-            newSol.setSolutionCoordinates(Arrays.copyOf(solutionData, solutionData.length));
-            mutateSolution(newSol, random);
-            result.add(newSol);
+            mutateSolution(solution, random);
+        }
+        return population;
+    }
+
+    private int chooseFigure(int[][] solutionCoordinates) {
+        int[] result = new int[solutionCoordinates.length];
+
+        for (int i = 0; i < solutionCoordinates.length; i++) {
+            for (int j = i + 1; j < solutionCoordinates.length; j++) {
+                int x1 = solutionCoordinates[i][0];
+                int y1 = solutionCoordinates[i][1];
+                int x2 = solutionCoordinates[j][0];
+                int y2 = solutionCoordinates[j][1];
+
+                if (x1 == x2) {
+                    result[i] += 1;
+                    result[j] += 1;
+                }
+
+                if (y1 == y2) {
+                    result[i] += 1;
+                    result[j] += 1;
+                }
+
+                if (x1 + y1 == x2 + y2) {
+                    result[i] += 1;
+                    result[j] += 1;
+                }
+                if (x1 - y1 == x2 - y2) {
+                    result[i] += 1;
+                    result[j] += 1;
+                }
+            }
         }
 
-        return population;
+
+        int figure = 0;
+        int maxNumOfCollisions = 0;
+
+        for (int i = 0; i < solutionCoordinates.length; i++) {
+            int curNumOfCollisions = result[i];
+            if (maxNumOfCollisions < curNumOfCollisions) {
+                figure = i;
+                maxNumOfCollisions = curNumOfCollisions;
+            }
+        }
+
+
+
+        return figure;
     }
 
     // # - coordinates start, * - figure
@@ -34,11 +76,12 @@ public class MyMutation implements EvolutionaryOperator<MySolution> {
     // 3*4
     // 567
     private void mutateSolution(MySolution solution, Random random) {
-        int[][] solutionPath = solution.getSolutionCoordinates();
-        int figure = random.nextInt(solutionPath.length);
+        int[][] solutionCoordinates = solution.getSolutionCoordinates();
 
-        int x1 = solutionPath[figure][0];
-        int y1 = solutionPath[figure][1];
+        int figure = chooseFigure(solutionCoordinates);
+
+        int x1 = solutionCoordinates[figure][0];
+        int y1 = solutionCoordinates[figure][1];
 
         boolean[] orders2move = new boolean[4];
 
@@ -46,8 +89,8 @@ public class MyMutation implements EvolutionaryOperator<MySolution> {
 
         borders_distance[1] = y1 - 1;
         borders_distance[3] = x1 - 1;
-        borders_distance[4] = solutionPath.length - x1;
-        borders_distance[6] = solutionPath.length - y1;
+        borders_distance[4] = solutionCoordinates.length - x1;
+        borders_distance[6] = solutionCoordinates.length - y1;
 
         borders_distance[0] = Math.min(borders_distance[1], borders_distance[3]);
         borders_distance[2] = Math.min(borders_distance[1], borders_distance[4]);
@@ -55,12 +98,12 @@ public class MyMutation implements EvolutionaryOperator<MySolution> {
         borders_distance[7] = Math.min(borders_distance[4], borders_distance[6]);
 
 
-        for (int j = 0; j < solutionPath.length; j++) {
+        for (int j = 0; j < solutionCoordinates.length; j++) {
             if (figure == j) {
                 continue;
             }
-            int x2 = solutionPath[j][0];
-            int y2 = solutionPath[j][1];
+            int x2 = solutionCoordinates[j][0];
+            int y2 = solutionCoordinates[j][1];
 
             if (x1 == x2) {
                 orders2move[1] = true;
@@ -99,24 +142,22 @@ public class MyMutation implements EvolutionaryOperator<MySolution> {
             }
         }
 
-        ArrayList<Integer> orders_choosed = new ArrayList<>();
+        ArrayList<Integer> ordersVariants = new ArrayList<>();
 
         if (orders2move[0] && orders2move[1] && orders2move[2] && orders2move[3]) {
-            orders_choosed.add(0);
-            orders_choosed.add(1);
-            orders_choosed.add(2);
-            orders_choosed.add(3);
-        } else if (!(orders2move[0] || orders2move[1] || orders2move[2] || orders2move[3])) {
-            return;
+            ordersVariants.add(0);
+            ordersVariants.add(1);
+            ordersVariants.add(2);
+            ordersVariants.add(3);
         } else {
             for (int i = 0; i < orders2move.length; i++) {
                 if (!orders2move[i]) {
-                    orders_choosed.add(i);
+                    ordersVariants.add(i);
                 }
             }
         }
 
-        int order = orders_choosed.get(random.nextInt(orders_choosed.size()));
+        int order = ordersVariants.get(random.nextInt(ordersVariants.size()));
         int order_side = random.nextInt(2);
 
         switch (order) {
@@ -195,10 +236,10 @@ public class MyMutation implements EvolutionaryOperator<MySolution> {
             default:
                 break;
         }
-        solutionPath[figure][0] = x1;
-        solutionPath[figure][1] = y1;
+        solutionCoordinates[figure][0] = x1;
+        solutionCoordinates[figure][1] = y1;
 
 
-        solution.setSolutionCoordinates(solutionPath);
+        solution.setSolutionCoordinates(solutionCoordinates);
     }
 }

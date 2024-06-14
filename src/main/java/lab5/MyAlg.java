@@ -4,6 +4,7 @@ import org.uncommons.watchmaker.framework.*;
 import org.uncommons.watchmaker.framework.operators.EvolutionPipeline;
 import org.uncommons.watchmaker.framework.selection.RouletteWheelSelection;
 import org.uncommons.watchmaker.framework.termination.GenerationCount;
+import org.uncommons.watchmaker.framework.termination.TargetFitness;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,6 +43,7 @@ public class MyAlg {
         });
 
         TerminationCondition terminate = new GenerationCount(generations);
+//        TerminationCondition terminate = new TargetFitness(0.0, false);
         algorithm.evolve(populationSize, 1, terminate);
     }
 }
