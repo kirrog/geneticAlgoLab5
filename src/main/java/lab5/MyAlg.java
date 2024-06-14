@@ -13,7 +13,7 @@ import java.util.Random;
 public class MyAlg {
 
     public static void main(String[] args) {
-        int dimension = 4; // dimension of problem
+        int dimension = 16; // dimension of problem
         int populationSize = 5; // size of population
         int generations = 1000; // number of generations
 
@@ -36,14 +36,20 @@ public class MyAlg {
         algorithm.addEvolutionObserver(new EvolutionObserver() {
             public void populationUpdate(PopulationData populationData) {
                 double bestFit = populationData.getBestCandidateFitness();
-                System.out.println("Generation " + populationData.getGenerationNumber() + ": " + bestFit);
-                System.out.println("\tBest solution = " + (MySolution)populationData.getBestCandidate());
+                double mean = populationData.getMeanFitness();
+                double std = populationData.getFitnessStandardDeviation();
+                System.out.println("Generation " + populationData.getGenerationNumber() +
+                        ": Best fit: " + bestFit +
+                        " Mean fit: " + mean +
+                        " Std: " + std);
+                System.out.println("\tBest solution = " + (MySolution) populationData.getBestCandidate());
                 System.out.println("\tPop size = " + populationData.getPopulationSize());
             }
         });
 
-        TerminationCondition terminate = new GenerationCount(generations);
-//        TerminationCondition terminate = new TargetFitness(0.0, false);
+//        TerminationCondition terminate = new GenerationCount(generations);
+        TerminationCondition terminate = new TargetFitness(0.0, false);
         algorithm.evolve(populationSize, 1, terminate);
+
     }
 }

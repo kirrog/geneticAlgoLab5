@@ -17,9 +17,23 @@ public class MyMutation implements EvolutionaryOperator<MySolution> {
 
     public List<MySolution> apply(List<MySolution> population, Random random) {
         for (MySolution solution : population) {
-            mutateSolution(solution, random);
+            mutateByChange(solution, random);
         }
         return population;
+    }
+
+    private void mutateByChange(MySolution solution, Random random) {
+        int[][] solutionCoordinates = solution.getSolutionCoordinates();
+
+        int coordinateAxis = random.nextInt(2);
+        int firstLine = random.nextInt(solutionCoordinates.length);
+        int secondLine = random.nextInt(solutionCoordinates.length);
+
+        int coordTemp = solutionCoordinates[firstLine][coordinateAxis];
+        solutionCoordinates[firstLine][coordinateAxis] = solutionCoordinates[secondLine][coordinateAxis];
+        solutionCoordinates[secondLine][coordinateAxis] = coordTemp;
+
+
     }
 
     private int chooseFigure(int[][] solutionCoordinates) {
@@ -64,7 +78,6 @@ public class MyMutation implements EvolutionaryOperator<MySolution> {
                 maxNumOfCollisions = curNumOfCollisions;
             }
         }
-
 
 
         return figure;

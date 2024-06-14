@@ -41,9 +41,9 @@ public class FitnessFunction implements FitnessEvaluator<MySolution> {
                 }
             }
         }
-        if (result == 1.0){
-            int a = 0;
-        }
+//        if (result == 1.0){
+//            int a = 0;
+//        }
 
         return result;
     }
